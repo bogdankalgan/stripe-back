@@ -14,23 +14,44 @@ export default async function handler(req, res) {
         return res.status(405).end();
     }
 
-    const {items} = req.body;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const {items, customItem} = req.body;
 
     try {
-        const session = await stripe.checkout.sessions.create({
-            line_items: items.map(item => ({
+        let line_items = [];
+
+        if (customItem) {
+            line_items.push({
+                price_data: {
+                    currency: 'rub',
+                    product_data: {
+                        name: customItem.name,
+                        description: customItem.description,
+                    },
+                    unit_amount: customItem.amount,
+                },
+                quantity: 1
+            });
+        } else if (items && Array.isArray(items)) {
+            line_items = items.map(item => ({
                 price: item.price_id,
                 quantity: item.count,
-            })),
+            }));
+        } else {
+            return res.status(400).json({error: 'Invalid input'});
+        }
+
+        const session = await stripe.checkout.sessions.create({
+            line_items,
             mode: 'payment',
             success_url: 'https://react-macaroon-shop.vercel.app/success',
             cancel_url: 'https://react-macaroon-shop.vercel.app/cancel',
         });
 
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.status(200).json({url: session.url});
+        return res.status(200).json({url: session.url});
     } catch (e) {
         console.error(e);
-        res.status(500).json({error: e.message});
+        return res.status(500).json({error: e.message});
     }
 }
