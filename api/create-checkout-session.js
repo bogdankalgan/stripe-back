@@ -43,12 +43,12 @@ export default async function handler(req, res) {
 
     for (const item of line_items) {
         if (
-            !item.price ||
-            typeof item.price !== "string" ||
-            typeof item.quantity !== "number"
+            (item.price && typeof item.price === "string" && typeof item.quantity === "number") ||
+            (item.price_data && typeof item.price_data === "object" && typeof item.quantity === "number")
         ) {
-            return res.status(400).json({ error: "Invalid format in line_items" });
+            continue;
         }
+        return res.status(400).json({ error: "Invalid format in line_items" });
     }
 
     try {
