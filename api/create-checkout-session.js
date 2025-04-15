@@ -10,10 +10,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 console.log(process.env.STRIPE_SECRET_KEY)
 
 export default async function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Origin', 'https://react-macaroon-shop.vercel.app');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
     if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         return res.status(200).send('ok');
     }
 
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
             cancel_url: 'https://react-macaroon-shop.vercel.app/cancel',
         });
 
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Origin', 'https://react-macaroon-shop.vercel.app');
         return res.status(200).json({ url: session.url });
     } catch (e) {
         console.error("❌ Stripe error:", e);
