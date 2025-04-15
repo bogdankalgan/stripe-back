@@ -10,7 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 console.log(process.env.STRIPE_SECRET_KEY)
 
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'https://react-macaroon-shop.vercel.app');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -53,9 +53,31 @@ export default async function handler(req, res) {
     }
 
     try {
+        const convertedLineItems = line_items.map(item => {
+            if (item.price_data) {
+                const amountRub = item.price_data.unit_amount || 0;
+                const amountUsd = Math.round(amountRub / 90);
+                const product_data = item.price_data.product_data || {};
+
+                if (product_data.description === '') {
+                    delete product_data.description;
+                }
+
+                return {
+                    price_data: {
+                        currency: "usd",
+                        unit_amount: amountUsd,
+                        product_data
+                    },
+                    quantity: item.quantity || 1
+                };
+            }
+            return item;
+        });
+
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
-            line_items,
+            line_items: convertedLineItems,
             mode: 'payment',
             success_url: 'https://react-macaroon-shop.vercel.app/success',
             cancel_url: 'https://react-macaroon-shop.vercel.app/cancel',
