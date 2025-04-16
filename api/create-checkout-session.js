@@ -37,11 +37,6 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Invalid or missing line_items" });
     }
 
-    if(!Array.isArray(line_items) || line_items.length === 0) {
-        return res.status(400).json({ error: "Invalid or missing line_items" });
-    }
-
-
     for (const item of line_items) {
         const isPriceId = typeof item.price === "string";
         const isPriceData = typeof item.price_data === "object";
@@ -56,7 +51,7 @@ export default async function handler(req, res) {
         const convertedLineItems = line_items.map(item => {
             if (item.price_data) {
                 const amountRub = item.price_data.unit_amount || 0;
-                const amountUsd = Math.round(amountRub / 90);
+                const amountUsd = Math.max(1500, Math.round(amountRub / 90));
                 const product_data = item.price_data.product_data || {};
 
                 if (product_data.description === '') {
