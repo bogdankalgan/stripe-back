@@ -52,10 +52,10 @@ export default async function handler(req, res) {
             if (item.price_data) {
                 const amountRub = item.price_data.unit_amount || 0;
                 const amountUsd = Math.max(1500, Math.round(amountRub / 90));
-                const product_data = item.price_data.product_data || {};
+                const product_data = {...item.price_data.product_data};
 
-                if (product_data.description === '') {
-                    delete product_data.description;
+                if(!product_data.description || product_data.description.trim() === "") {
+                    delete product_data.dstFactor
                 }
 
                 return {
@@ -67,7 +67,10 @@ export default async function handler(req, res) {
                     quantity: item.quantity || 1
                 };
             }
-            return item;
+            return {
+                price: item.price,
+                quantity: item.quantity || 1
+            }
         });
 
         const session = await stripe.checkout.sessions.create({
