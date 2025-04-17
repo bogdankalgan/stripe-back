@@ -52,7 +52,10 @@ export default async function handler(req, res) {
         const convertedLineItems = line_items.map(item => {
             if (item.price_data) {
                 const amountRub = item.price_data.unit_amount || 0;
-                const amountUsd = Math.max(1500, Math.round(amountRub / 90));
+                let amountUsd = Math.round(amountRub / 90);
+                if (amountUsd < 1500) {
+                    amountUsd = 1500;
+                }
                 const product_data = {...item.price_data.product_data};
 
                 if (!product_data.description || product_data.description.trim() === "") {
@@ -75,7 +78,7 @@ export default async function handler(req, res) {
         });
 
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
+            payment_method_types: ['card', 'apple_pay'],
             line_items: convertedLineItems,
             mode: 'payment',
             success_url: 'https://react-macaroon-shop.vercel.app/success',
