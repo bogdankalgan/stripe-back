@@ -33,6 +33,7 @@ export default async function handler(req, res) {
     }
 
     const { line_items } = body;
+    console.log("📦 Получены line_items:", JSON.stringify(line_items, null, 2));
     if (!Array.isArray(line_items) || line_items.length === 0) {
         return res.status(400).json({ error: "Invalid or missing line_items" });
     }
@@ -54,8 +55,8 @@ export default async function handler(req, res) {
                 const amountUsd = Math.max(1500, Math.round(amountRub / 90));
                 const product_data = {...item.price_data.product_data};
 
-                if(!product_data.description || product_data.description.trim() === "") {
-                    delete product_data.dstFactor
+                if (!product_data.description || product_data.description.trim() === "") {
+                    delete product_data.description;
                 }
 
                 return {
