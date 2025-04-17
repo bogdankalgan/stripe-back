@@ -15,7 +15,10 @@ export default async function handler(req, res) {
         "https://react-macaroon-shop.vercel.app/"
     ]
 
-    res.setHeader('Access-Control-Allow-Origin', allowedOrigins);
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -89,7 +92,7 @@ export default async function handler(req, res) {
             line_items: convertedLineItems,
             mode: 'payment',
             success_url: 'https://react-macaroon-shop.vercel.app/success',
-            cancel_url: 'https://react-macaroon-shop.vercel.app/cancel'
+            cancel_url: 'https://react-macaroon-shop.vercel.app/cancel',
         });
 
         res.setHeader('Access-Control-Allow-Origin', 'https://react-macaroon-shop.vercel.app');
