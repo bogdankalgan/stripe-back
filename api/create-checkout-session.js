@@ -64,7 +64,7 @@ export default async function handler(req, res) {
 
                 return {
                     price_data: {
-                        currency: "usd",
+                        currency: "rub",
                         unit_amount: amountUsd,
                         product_data
                     },
@@ -73,7 +73,9 @@ export default async function handler(req, res) {
             }
             return {
                 price: item.price,
-                quantity: item.quantity || 1
+                quantity: item.quantity || 1,
+                // ⚠️ Stripe требует чтобы currency совпадала у всех price_id
+                // Если у кастомных usd, то убедись что все price_id тоже с usd
             }
         });
 
