@@ -78,11 +78,11 @@ export default async function handler(req, res) {
         });
 
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card', 'apple_pay'],
+            payment_method_types: ['card'],
             line_items: convertedLineItems,
             mode: 'payment',
             success_url: 'https://react-macaroon-shop.vercel.app/success',
-            cancel_url: 'https://react-macaroon-shop.vercel.app/cancel',
+            cancel_url: 'https://react-macaroon-shop.vercel.app/cancel'
         });
 
         res.setHeader('Access-Control-Allow-Origin', 'https://react-macaroon-shop.vercel.app');
