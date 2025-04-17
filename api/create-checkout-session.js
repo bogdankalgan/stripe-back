@@ -69,7 +69,7 @@ export default async function handler(req, res) {
 
                 return {
                     price_data: {
-                        currency: "rub",
+                        currency: "usd",
                         unit_amount: amountUsd,
                         product_data
                     },
