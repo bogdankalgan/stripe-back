@@ -87,6 +87,7 @@ export default async function handler(req, res) {
             }
         });
 
+        console.log("📦 Отправляем в Stripe:", JSON.stringify(convertedLineItems, null, 2));
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: convertedLineItems,
@@ -95,7 +96,9 @@ export default async function handler(req, res) {
             cancel_url: 'https://react-macaroon-shop.vercel.app/cancel',
         });
 
-        res.setHeader('Access-Control-Allow-Origin', 'https://react-macaroon-shop.vercel.app');
+        if (allowedOrigins.includes(origin)) {
+            res.setHeader('Access-Control-Allow-Origin', origin);
+        }
         return res.status(200).json({ url: session.url });
     } catch (e) {
         console.error("❌ Stripe error:", e);
