@@ -60,10 +60,8 @@ export default async function handler(req, res) {
         const convertedLineItems = line_items.map(item => {
             if (item.price_data) {
                 const amountRub = item.price_data.unit_amount || 0;
-                let amountUsd = Math.round(amountRub / 90);
-                if (amountUsd < 1500) {
-                    amountUsd = 1500;
-                }
+                let amountUsd = Math.round((amountRub / 90) * 100);
+                if (amountUsd < 50) amountUsd = 50;
                 const product_data = {...item.price_data.product_data};
 
                 if (!product_data.description || product_data.description.trim() === "") {
@@ -82,8 +80,6 @@ export default async function handler(req, res) {
             return {
                 price: item.price,
                 quantity: item.quantity || 1,
-                // ⚠️ Stripe требует чтобы currency совпадала у всех price_id
-                // Если у кастомных usd, то убедись что все price_id тоже с usd
             }
         });
 
