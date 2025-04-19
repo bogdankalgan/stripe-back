@@ -11,11 +11,14 @@ console.log(process.env.STRIPE_SECRET_KEY)
 
 export default async function handler(req, res) {
     const allowedOrigins = [
-        "http://localhost:3000/",
-        "https://react-macaroon-shop.vercel.app/"
-    ]
+        "http://localhost:3000",
+        "https://react-macaroon-shop.vercel.app"
+    ];
 
     const origin = req.headers.origin;
+    if (!origin) {
+        console.warn("⚠️ Origin не указан в заголовках");
+    }
     if (allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     }
