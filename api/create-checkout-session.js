@@ -82,9 +82,16 @@ export default async function handler(req, res) {
             }
             return {
                 price: item.price,
-                quantity: item.quantity || 1,
-            }
+                quantity: item.quantity || 1
+            };
         });
+
+        const hasPrice = convertedLineItems.some(item => item.price);
+        const hasPriceData = convertedLineItems.some(item => item.price_data);
+
+        if (hasPrice && hasPriceData) {
+            return res.status(400).json({ error: "Cannot mix items with price_id and price_data in the same session. All items must use one format." });
+        }
 
         console.log("📦 Отправляем в Stripe:", JSON.stringify(convertedLineItems, null, 2));
         const session = await stripe.checkout.sessions.create({
@@ -93,6 +100,9 @@ export default async function handler(req, res) {
             mode: 'payment',
             success_url: 'https://react-macaroon-shop.vercel.app/success',
             cancel_url: 'https://react-macaroon-shop.vercel.app/cancel',
+            billing_address_collection: req.body.billing_address_collection,
+            phone_number_collection: req.body.phone_number_collection,
+            shipping_address_collection: req.body.shipping_address_collection,
         });
 
         if (allowedOrigins.includes(origin)) {
